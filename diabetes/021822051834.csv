@@ -1,0 +1,2 @@
+round_epochs,loss,accuracy,val_loss,val_accuracy,activation,batch_size,first_neuron
+4,2.9838779365333417,0.4856771,2.5288392829172537,0.5194805,relu,10,12
