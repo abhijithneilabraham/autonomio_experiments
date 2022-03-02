@@ -6,7 +6,7 @@ p = {
     'activation': ['relu', 'elu'],
     'batch_size': [10, 20]
 }
-d=DistributeScan(params=p,config_path='config.json',file_path="talos_test.py")
+d=DistributeScan(params=p,config='config.json',file_path="talos_test.py")
 print(d.distributed_run(run_local=True))
 
 
