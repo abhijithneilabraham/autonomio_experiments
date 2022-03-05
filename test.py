@@ -1,31 +1,27 @@
-# from talos.parameters import ParamSpace
-p = {
-    'first_neuron': [12,20, 24],
-    'activation': ['relu', 'elu'],
-    'batch_size': [10, 20]
-}
+import os
+import paramiko 
+clients = paramiko.SSHClient()
+with open('talos_sample/config.json','r') as f:
+    import json
+    config=json.load(f)["machines"][0]
+host = config['TALOS_IP_ADDRESS']
+port = config['TALOS_PORT']
+username = config['TALOS_USER']
+password = config['TALOS_PASSWORD']
+client = paramiko.SSHClient()
+client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+client.connect(host, port, username, password)
+# client.connect('162.255.116.98', username="root", password="@zIZVAPyMVOlQ3kWkSj8f$")
+sftp_client = client.open_sftp()
+localpath = 'talos_sample/'
+remotepath = './diabetes/'
+# sftp.get(remotepath, localpath)
+# sftp.close()
+# client.close()
+sftp_client.chdir(remotepath)
+for f in sorted(sftp_client.listdir_attr(), key=lambda k: k.st_mtime, reverse=True):
+    sftp_client.get(f.filename,localpath+"/"+f.filename )
+    break
 
-def create_param_space(params):
-
-    from talos.parameters.ParamSpace import ParamSpace
-    param_keys=params.keys()
-    param_grid= ParamSpace(params, param_keys)._param_space_creation()
-    def __column(matrix, i):
-        return [row[i] for row in matrix]
-    new_params={k:[] for k in param_keys}
-    for key_index,key in enumerate(param_keys):
-        new_params[key]=__column(param_grid,key_index)
-    def __split_params(n_splits=2):
-        d=new_params
-        dicts=[{} for i in range(n_splits)]
-        def _chunkify(lst,n):
-          return [lst[i::n] for i in range(n)]
-        for k,v in d.items():
-            for i in range(n_splits):
-                dicts[i][k]=_chunkify(v, n_splits)[i]
-        return dicts
-    new_params=__split_params()
-    return new_params
-        
-
-print(create_param_space(p))
+sftp_client.close()
+client.close()
