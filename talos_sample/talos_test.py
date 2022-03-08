@@ -32,4 +32,5 @@ def diabetes(x_train, y_train, x_val, y_val, params):
 
 import sys
 p=eval(sys.argv[1])
-t = talos.Scan(x=x, y=y, params=p, model=diabetes, experiment_name='diabetes')
+exp_name=sys.argv[2]
+t = talos.Scan(x=x, y=y, params=p, model=diabetes, experiment_name=exp_name)
