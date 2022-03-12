@@ -84,10 +84,22 @@ class Database:
         Create database if it doesn't exists.
         """
         try:
-            engine = create_engine(self.DB_URL, echo=False,encoding=self.encoding)
+            
+            engine = create_engine(self.DB_URL, echo=False,
+                                  isolation_level="AUTOCOMMIT" 
+                                  )
+            
             if not database_exists(engine.url):
-                create_database(engine.url)
                 
+                new_engine = create_engine(self.DB_URL.replace(self.database_name,""), echo=False,
+                                      isolation_level="AUTOCOMMIT" 
+                                      )
+                conn=new_engine.connect()
+                conn.execute("""
+                             CREATE DATABASE {} ENCODING '{}' 
+                             """.format(self.database_name,
+                                        self.encoding))
+            
         except DatabaseError as e:
             import traceback
 
@@ -129,7 +141,7 @@ class Database:
 
         """
         engine = self.create_db()
-        data_frame.to_sql(self.table_name, con=engine, if_exists="append")
+        data_frame.to_sql(self.table_name, con=engine, if_exists="append",index=False)
 
     def query_table(self, query):
         """
@@ -162,3 +174,11 @@ class Database:
         """
         res = self.query_table("SELECT * FROM {}".format(self.table_name))
         return res
+    
+
+
+
+
+
+
+
